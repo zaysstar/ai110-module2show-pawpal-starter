@@ -61,55 +61,45 @@ Based on AI feedback during the scaffolding phase, I decided to implement `Task`
 ## 2. Scheduling Logic and Tradeoffs
 
 **a. Constraints and priorities**
-
-- What constraints does your scheduler consider (for example: time, priority, preferences)?
-- How did you decide which constraints mattered most?
+My scheduler primarily considers **time** as the main constraint. The logic ensures that when a user views their daily schedule, the tasks are sorted chronologically. I also implemented a constraint for **conflict detection**, which flags if multiple tasks are scheduled at the exact same time. I prioritized these because chronological order is the most fundamental requirement for any daily planner, and preventing double-booking is the first step toward "smart" scheduling.
 
 **b. Tradeoffs**
-
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+One major tradeoff in my current `Scheduler` is how it handles conflicts. Right now, the algorithm only checks for *exact time matches* (e.g., two tasks at exactly 10:00). It does not account for task *duration* (e.g., a 60-minute walk starting at 10:00 overlapping with a feeding at 10:30). This tradeoff is reasonable for this scenario because it keeps the baseline logic lightweight and functional for a prototype, avoiding the complex datetime math required for full overlap detection.
 
 ---
 
 ## 3. AI Collaboration
 
 **a. How you used AI**
-
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+I used AI extensively as a "co-pilot" for scaffolding and bridging systems. I used it to generate the initial Mermaid.js UML diagram to visualize the architecture, draft the Python `@dataclass` skeletons, and figure out how to navigate Streamlit's `st.session_state` so my `Owner` data wouldn't wipe out on every page refresh. The most helpful prompts were specific, context-bound requests, such as asking exactly how to write a lambda function to sort my "HH:MM" time strings.
 
 **b. Judgment and verification**
-
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
+During the implementation of Phase 4 (Algorithms), I pasted my code to the AI and it accidentally output a class with two identical `get_daily_schedule` methods—one from Phase 2 and the new one for Phase 4. Instead of blindly accepting the output, I had to evaluate the structure, recognize that Python would just overwrite the first method (leaving messy, redundant code), and ensure the old method was cleanly deleted so the new sorting logic took over properly.
 
 ---
 
 ## 4. Testing and Verification
 
 **a. What you tested**
-
-- What behaviors did you test?
-- Why were these tests important?
+I tested four core behaviors using `pytest`:
+1. **State changes:** Verifying `mark_complete()` correctly flips the boolean.
+2. **Object relationships:** Verifying that adding a `Task` to a `Pet` actually increases the pet's task array length.
+3. **Sorting:** Verifying the `Scheduler` orders an unsorted list of tasks chronologically.
+4. **Conflicts:** Verifying the `Scheduler` correctly generates warning strings when given duplicate times.
+These tests were critical because Streamlit UIs can be difficult to debug. By proving the core "brain" of the app works in isolation, I knew any bugs in the browser were purely UI issues, not logic failures.
 
 **b. Confidence**
-
-- How confident are you that your scheduler works correctly?
-- What edge cases would you test next if you had more time?
+I am highly confident (5/5) in the current iteration of the logic. If I had more time, the next edge cases I would test are: tasks scheduled exactly at midnight ("00:00"), adding a pet with no tasks to ensure the scheduler doesn't crash on an empty list, and testing the recurrence logic across month boundaries (e.g., a daily task on February 28th).
 
 ---
 
 ## 5. Reflection
 
 **a. What went well**
-
-- What part of this project are you most satisfied with?
+I am most satisfied with successfully bridging the gap between standard Python backend logic and the Streamlit frontend. Getting the object-oriented `Owner`, `Pet`, and `Task` instances to persist in Streamlit's memory vault (`st.session_state`) was a huge win that made the app feel like a real piece of software.
 
 **b. What you would improve**
-
-- If you had another iteration, what would you improve or redesign?
+In the next iteration, I would implement a Priority system (High, Medium, Low) and add task durations. The scheduler would then be able to organize tasks not just chronologically, but by urgency, while accurately preventing overlapping time blocks.
 
 **c. Key takeaway**
-
-- What is one important thing you learned about designing systems or working with AI on this project?
+My biggest takeaway as a "lead architect" collaborating with AI is that while AI is incredibly fast at generating boilerplate code and UI layouts, it cannot manage the overall system state for you. I still had to orchestrate how the pieces fit together and act as the gatekeeper to ensure redundant code didn't slip into the final product.

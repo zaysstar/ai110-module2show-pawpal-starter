@@ -62,8 +62,27 @@ class Scheduler:
         self.owner = owner
 
     def get_daily_schedule(self) -> List[Task]:
-        """Retrieves all tasks for the day."""
-        # For Phase 2, we just return all tasks. We will add sorting in Phase 4!
-        return self.owner.get_all_tasks()
-        
-    # We will build out sort_by_time, check_conflicts, and filter_tasks in Phase 4
+        """Retrieves and sorts all tasks for the day."""
+        all_tasks = self.owner.get_all_tasks()
+        return self.sort_by_time(all_tasks)
+
+    def sort_by_time(self, tasks: List[Task]) -> List[Task]:
+        """Sorts a list of tasks chronologically by their time attribute."""
+        # Uses a lambda function as a key to sort the "HH:MM" strings
+        return sorted(tasks, key=lambda task: task.time)
+
+    def check_conflicts(self, tasks: List[Task]) -> List[str]:
+        """Checks for overlapping tasks and returns a list of warning messages."""
+        seen_times = set()
+        warnings = []
+        for task in tasks:
+            if task.time in seen_times:
+                warnings.append(f"⚠️ Conflict Detected: Multiple tasks scheduled at {task.time}!")
+            seen_times.add(task.time)
+        return warnings
+
+    def filter_tasks(self, tasks: List[Task], status: bool = None) -> List[Task]:
+        """Filters tasks based on completion status."""
+        if status is None:
+            return tasks
+        return [task for task in tasks if task.is_complete == status]
