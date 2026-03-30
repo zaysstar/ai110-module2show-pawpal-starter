@@ -9,12 +9,12 @@ class Task:
     is_complete: bool = False
 
     def mark_complete(self):
-        """Marks the task as complete and handles recurrence."""
-        pass
+        """Marks the task as complete."""
+        self.is_complete = True
 
     def update_time(self, new_time: str):
         """Updates the scheduled time of the task."""
-        pass
+        self.time = new_time
 
 @dataclass
 class Pet:
@@ -24,15 +24,15 @@ class Pet:
 
     def add_task(self, task: Task):
         """Adds a new task to the pet's list."""
-        pass
+        self.tasks.append(task)
 
     def get_pending_tasks(self) -> List[Task]:
         """Returns a list of tasks that are not yet complete."""
-        pass
+        return [task for task in self.tasks if not task.is_complete]
 
     def get_all_tasks(self) -> List[Task]:
         """Returns all tasks for this pet."""
-        pass
+        return self.tasks
 
 class Owner:
     def __init__(self, name: str):
@@ -41,15 +41,21 @@ class Owner:
 
     def add_pet(self, pet: Pet):
         """Adds a new pet to the owner's profile."""
-        pass
+        self.pets.append(pet)
 
     def get_pet(self, name: str) -> Pet:
         """Retrieves a pet by its name."""
-        pass
+        for pet in self.pets:
+            if pet.name.lower() == name.lower():
+                return pet
+        return None
 
     def get_all_tasks(self) -> List[Task]:
         """Aggregates and returns every task from all of the owner's pets."""
-        pass
+        all_tasks = []
+        for pet in self.pets:
+            all_tasks.extend(pet.get_all_tasks())
+        return all_tasks
 
 class Scheduler:
     def __init__(self, owner: Owner):
@@ -57,16 +63,7 @@ class Scheduler:
 
     def get_daily_schedule(self) -> List[Task]:
         """Retrieves all tasks for the day."""
-        pass
-
-    def sort_by_time(self, tasks: List[Task]) -> List[Task]:
-        """Sorts a list of tasks chronologically by their time attribute."""
-        pass
-
-    def check_conflicts(self):
-        """Checks for overlapping tasks and returns warnings."""
-        pass
-
-    def filter_tasks(self, status: bool = None, pet_name: str = None) -> List[Task]:
-        """Filters tasks based on completion status or a specific pet."""
-        pass
+        # For Phase 2, we just return all tasks. We will add sorting in Phase 4!
+        return self.owner.get_all_tasks()
+        
+    # We will build out sort_by_time, check_conflicts, and filter_tasks in Phase 4
